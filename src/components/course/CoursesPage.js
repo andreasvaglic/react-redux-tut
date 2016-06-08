@@ -1,6 +1,7 @@
 import React, { PropTypes } from "react";
 import { connect } from "react-redux";
 import * as courseActions from "../../actions/courseActions";
+import {bindActionCreators} from "redux";
 
 class CoursesPage extends React.Component {
 	constructor(props, context) {
@@ -21,7 +22,7 @@ class CoursesPage extends React.Component {
 	}
 
 	onClickSave() {
-		this.props.dispatch(courseActions.createCourse(this.state.course));
+		this.props.actions.createCourse(this.state.course);
 	}
 
 	courseRow(course, index) {
@@ -29,7 +30,6 @@ class CoursesPage extends React.Component {
 	}
 
 	render() {
-		debugger;
 		return (
 			<div>
 				<h1>Courses</h1>
@@ -51,12 +51,11 @@ class CoursesPage extends React.Component {
 }
 
 CoursesPage.propTypes = {
-	dispatch: PropTypes.func.isRequired,
-	courses: PropTypes.array.isRequired
+	courses: PropTypes.array.isRequired,
+	actions: PropTypes.func
 };
 
 function mapStateToProps(state, ownProps) {
-	debugger;
 	return {
 		// .courses --> look into rootReducer!
 		courses: state.courses
@@ -64,10 +63,20 @@ function mapStateToProps(state, ownProps) {
 }
 
 // WHat actions to expose on components
-//function mapDispatchToProps() {}
+// dispatch - is injected in by the connect()
+function mapDispatchToProps(dispatch) {
+	return {
+		actions: bindActionCreators(courseActions, dispatch)
+	};
+}
 
 /* Same as
 const connectedStateAndProps = connect(mapStateToProps, mapDispatchToProps);
 connectedStateAndProps(CoursesPage);
 */
-export default connect(mapStateToProps)(CoursesPage);
+
+/*
+	Once we add mapDispatchToProps to connect(), the dispatch fn will no longer
+	be attached to our component
+*/
+export default connect(mapStateToProps, mapDispatchToProps)(CoursesPage);
